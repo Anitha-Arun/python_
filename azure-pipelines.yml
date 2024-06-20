@@ -1,26 +1,25 @@
 trigger:
-- main
+- main  # Trigger pipeline on commits to the master branch
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-latest'  # Specify the VM image to use
 
 steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.x'  # Use Python 3.x version
-
 - script: |
-    python -m pip install --upgrade pip
-    pip install Flask
+    python -V  # Verify Python version
+    pip install -r requirements.txt  # Install dependencies
   displayName: 'Install dependencies'
 
 - script: |
-    python app.py & echo $! > flask_app.pid
-    sleep 10  # Allow some time for the Flask app to start
-    curl http://127.0.0.1:5000  # Test accessing the Flask app
-  displayName: 'Run Flask application'
+    python -m unittest discover -s tests  # Run your tests here (if applicable)
+  displayName: 'Run tests'
 
 - script: |
-    kill $(cat flask_app.pid)
-    rm flask_app.pid
-  displayName: 'Stop Flask application'
+    python app.py  # Start Flask server
+  displayName: 'Run Flask application'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)'
+    artifact: 'flask-app'
+  displayName: 'Publish Flask application artifact'
