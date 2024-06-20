@@ -15,7 +15,12 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    python app.py &
+    python app.py & echo $! > flask_app.pid
     sleep 10  # Allow some time for the Flask app to start
-    curl http://localhost:5000  # Test accessing the Flask app
+    curl http://127.0.0.1:5000  # Test accessing the Flask app
   displayName: 'Run Flask application'
+
+- script: |
+    kill $(cat flask_app.pid)
+    rm flask_app.pid
+  displayName: 'Stop Flask application'
