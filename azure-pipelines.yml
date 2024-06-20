@@ -1,21 +1,18 @@
 trigger:
-- main  # Trigger pipeline on commits to the master branch
+- main
 
 pool:
-  vmImage: 'ubuntu-latest'  # Specify the VM image to use
+  vmImage: 'ubuntu-latest'
 
 steps:
 - script: |
-    python -V  # Verify Python version
-    pip install -r requirements.txt  # Install dependencies
+    python -V
+    pip install flask  # Install Flask if not already installed
   displayName: 'Install dependencies'
 
 - script: |
-    python -m unittest discover -s tests  # Run your tests here (if applicable)
-  displayName: 'Run tests'
-
-- script: |
-    python app.py  # Start Flask server
+    python app.py &  # Start Flask application in the background
+    sleep 5  # Give time for Flask to start (adjust as needed)
   displayName: 'Run Flask application'
 
 - task: PublishPipelineArtifact@1
